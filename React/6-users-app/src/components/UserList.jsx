@@ -8,7 +8,8 @@ export const UserList = ({ handlerRemoveUser, handlerUserSelectedForm, users = [
             <th>#</th>
             <th>username</th>
             <th>email</th>
-            <th>update</th>
+            <th>update modal</th>
+            <th>update route</th>
             <th>remove</th>
         </tr>
     </thead>

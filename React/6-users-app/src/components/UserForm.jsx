@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { UserList } from "./UserList";
 import Swal from "sweetalert2";
 
-export const UserForm = ({ handleCloseForm, handlerAddUser, userSelected, initialUserForm }) => {
+export const UserForm = ({
+  handleCloseForm,
+  handlerAddUser,
+  userSelected,
+  initialUserForm,
+}) => {
   const [userForm, setUserForm] = useState(initialUserForm);
 
   const { id, username, password, email } = userForm;
@@ -36,6 +41,13 @@ export const UserForm = ({ handleCloseForm, handlerAddUser, userSelected, initia
       return;
     }
 
+    if (!email.includes('@'))
+      Swal.fire({
+        title: "Email validation error",
+        text: "The email should be valid, it must include an @",
+        icon: "error",
+      });
+
     handlerAddUser(userForm);
 
     // Save the userForm in the user lists
@@ -43,9 +55,9 @@ export const UserForm = ({ handleCloseForm, handlerAddUser, userSelected, initia
   };
 
   const onCloseForm = () => {
-     handleCloseForm();
-     setUserForm(initialUserForm);
-  }
+    handleCloseForm();
+    setUserForm(initialUserForm);
+  };
 
   return (
     <form onSubmit={onSubmit}>
@@ -82,10 +94,15 @@ export const UserForm = ({ handleCloseForm, handlerAddUser, userSelected, initia
       <button type="submit" className="btn btn-primary">
         {id > 0 ? "Edit" : "Create"}
       </button>
-      <button className="btn btn-primary mx-2" type="button"
-      onClick={onCloseForm}>
-        Close
-      </button>
+      { !handleCloseForm || (
+        <button
+          className="btn btn-primary mx-2"
+          type="button"
+          onClick={onCloseForm}
+        >
+          Close
+        </button>
+      )}
     </form>
   );
 };
