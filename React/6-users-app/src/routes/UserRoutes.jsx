@@ -2,65 +2,41 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { UsersPage } from "../pages/UsersPage";
 import { Navbar } from "../components/layout/Navbar";
 import { RegisterPage } from "../auth/pages/RegisterPage";
-import { useUsers } from "../hooks/useUsers";
+import { UserProvider } from "../context/UserProvider";
+import { useContext } from "react";
+import { AuthContext } from "../auth/context/AuthContext";
 
-export const UserRoutes = ({ login, handlerLogout }) => {
-  const {
-    users,
-    userSelected,
-    initialUserForm,
-    visibleForm,
-    handlerAddUser,
-    handlerRemoveUser,
-    handlerUserSelectedForm,
-    handlerOpenForm,
-    handleCloseForm,
-  } = useUsers();
+export const UserRoutes = () => {
 
   return (
     <>
-      <Navbar login={login} handlerLogout={handlerLogout} />
-      <Routes>
-        <Route
-          path="users"
-          element={
-            <UsersPage
-              users={users}
-              userSelected={userSelected}
-              initialUserForm={initialUserForm}
-              visibleForm={visibleForm}
-              handlerAddUser={handlerAddUser}
-              handlerRemoveUser={handlerRemoveUser}
-              handlerUserSelectedForm={handlerUserSelectedForm}
-              handlerOpenForm={handlerOpenForm}
-              handleCloseForm={handleCloseForm}
-            />
-          }
-        />
+      <UserProvider>
+        <Navbar />
+        <Routes>
+          <Route
+            path="users"
+            element={
+              <UsersPage />
+            }
+          />
 
-        <Route
-          path="users/register"
-          element={
-            <RegisterPage
-              handlerAddUser={handlerAddUser}
-              initialUserForm={initialUserForm}
-            />
-          }
-        />
+          <Route
+            path="users/register"
+            element={
+              <RegisterPage />
+            }
+          />
 
-        <Route
-          path="users/update/:id"
-          element={
-            <RegisterPage
-              users={users}
-              handlerAddUser={handlerAddUser}
-              initialUserForm={initialUserForm}
-            />
-          }
-        />
+          <Route
+            path="users/update/:id"
+            element={
+              <RegisterPage />
+            }
+          />
 
-        <Route path="/" element={<Navigate to="/users" />} />
-      </Routes>
+          <Route path="/" element={<Navigate to="/users" />} />
+        </Routes>
+      </UserProvider>
     </>
   );
 };

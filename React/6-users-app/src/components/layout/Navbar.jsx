@@ -1,6 +1,11 @@
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
+import { AuthContext } from "../../auth/context/AuthContext";
 
-export const Navbar = ({ login, handlerLogout }) => {
+export const Navbar = () => {
+  
+  const { login, handlerLogout } = useContext(AuthContext);
+
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
@@ -19,20 +24,21 @@ export const Navbar = ({ login, handlerLogout }) => {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div
-          className="collapse navbar-collapse"
-          id="navbarNav"
-        >
+        <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <NavLink className="nav-link" to="/users">Users</NavLink>
+              <NavLink className="nav-link" to="/users">
+                Users
+              </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/users/register">User Register</NavLink>
+              <NavLink className="nav-link" to="/users/register">
+                User Register
+              </NavLink>
             </li>
           </ul>
         </div>
-        
+
         <div
           className="collapse navbar-collapse justify-content-end"
           id="navbarNavLogout"

@@ -1,12 +1,11 @@
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
-export const UserRow = ({
-  handlerRemoveUser,
-  handlerUserSelectedForm,
-  id,
-  username,
-  email,
-}) => {
+export const UserRow = ({ id, username, email }) => {
+  const { handlerRemoveUser, handlerUserSelectedForm } =
+    useContext(UserContext);
+
   return (
     <tr key={id}>
       <td>{id}</td>
