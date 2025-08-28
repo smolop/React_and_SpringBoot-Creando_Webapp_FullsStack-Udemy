@@ -2,15 +2,9 @@ import { useReducer, useState } from "react";
 import { usersReducer } from "../reducers/usersReducer";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { createUser, findAllUsers, removeUser, updateUser } from "../services/userService";
 
-const initialUsers = [
-  {
-    id: 1,
-    username: "Pepito",
-    password: "12345",
-    email: "pepito@email.com",
-  },
-];
+const initialUsers = [];
 
 const initialUserForm = {
   id: 0,
@@ -25,12 +19,30 @@ export const useUsers = () => {
   const [visibleForm, setVisibleForm] = useState(false);
   const navigate = useNavigate();
 
-  const handlerAddUser = (user) => {
+  const getUsers = async () => { 
+    const result = await findAllUsers();
+    console.log(result);
+    if (result) {
+      dispatch({
+        type: "loadingUsers",
+        payload: result.data,
+      });
+    }
+  }
+
+  const handlerAddUser = async (user) => {
     // console.log(user);
+
+    let response;
+    if (user.id === 0) {
+      response = await createUser(user);
+    } else {
+      response = await updateUser(user);
+    }
 
     dispatch({
       type: user.id === 0 ? "addUser" : "updateUser",
-      payload: user,
+      payload: response.data,
     });
 
     Swal.fire({
@@ -59,6 +71,7 @@ export const useUsers = () => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
+        removeUser(id);
         dispatch({
           type: "removeUser",
           payload: id,
@@ -99,5 +112,6 @@ export const useUsers = () => {
     handlerUserSelectedForm,
     handlerOpenForm,
     handleCloseForm,
+    getUsers,
   };
 };
