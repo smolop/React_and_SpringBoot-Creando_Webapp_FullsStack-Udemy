@@ -1,12 +1,17 @@
 package com.sebas.backend.usersapp.backend_usersapp.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import javax.naming.Binding;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sebas.backend.usersapp.backend_usersapp.models.enitties.User;
 import com.sebas.backend.usersapp.backend_usersapp.services.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -44,7 +51,11 @@ public class UserController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result) {
+        if (result.hasErrors()) {
+            return validationErros(result);        
+        }
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(userService.saveUser(user));
@@ -52,7 +63,11 @@ public class UserController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody User user) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") Long id, @Valid @RequestBody User user, BindingResult result) {
+        if (result.hasErrors()) { 
+            return validationErros(result);
+        }
+
         Optional<User> userOptional = userService.updateUser(id, user);
         if (userOptional.isPresent()) {
             return ResponseEntity
@@ -72,4 +87,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    private ResponseEntity<?> validationErros(BindingResult result) {
+        Map<String, String> errors = new HashMap<>();
+
+        result.getFieldErrors().forEach(err -> {
+            errors.put(err.getField(), "The field " + err.getField() + " " + err.getDefaultMessage());
+        });
+
+        return ResponseEntity.badRequest().body(errors);
+    }
 }
