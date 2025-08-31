@@ -8,7 +8,7 @@ export const UserForm = ({
   userSelected,
 }) => {
 
-  const {handlerAddUser, initialUserForm} = useContext(UserContext);
+  const {handlerAddUser, initialUserForm, errors} = useContext(UserContext);
   const [userForm, setUserForm] = useState(initialUserForm);
 
   const { id, username, password, email } = userForm;
@@ -33,7 +33,7 @@ export const UserForm = ({
     event.preventDefault();
     // console.log(userForm)
 
-    if (!username || (!password && id === 0) || !email) {
+    /* if (!username || (!password && id === 0) || !email) {
       Swal.fire({
         title: "Validation error",
         text: "You should complete the form fields.",
@@ -47,12 +47,9 @@ export const UserForm = ({
         title: "Email validation error",
         text: "The email should be valid, it must include an @",
         icon: "error",
-      });
+      }); */
 
     handlerAddUser(userForm);
-
-    // Save the userForm in the user lists
-    setUserForm(initialUserForm);
   };
 
   const onCloseForm = () => {
@@ -71,6 +68,7 @@ export const UserForm = ({
         value={username}
         onChange={onInputChange}
       />
+      <p className="text-danger">{errors?.username}</p>
 
       {id > 0 || (
         <input
@@ -80,8 +78,9 @@ export const UserForm = ({
           value={password}
           name="password"
           onChange={onInputChange}
-        />
+        /> 
       )}
+      <p className="text-danger">{errors?.password}</p>
 
       <input
         className="form-control my-3 w-75"
@@ -91,6 +90,7 @@ export const UserForm = ({
         name="email"
         onChange={onInputChange}
       />
+      <p className="text-danger">{errors?.email}</p>
 
       <button type="submit" className="btn btn-primary">
         {id > 0 ? "Edit" : "Create"}

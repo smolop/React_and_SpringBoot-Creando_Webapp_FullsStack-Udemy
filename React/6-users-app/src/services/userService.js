@@ -23,9 +23,9 @@ export const createUser = async ({ username, email, password }) => {
     return response;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 
-  return undefined;
 };
 
 export const updateUser = async ({ id, username, email }) => {
@@ -33,13 +33,14 @@ export const updateUser = async ({ id, username, email }) => {
     const response = await axios.put(`${BASE_URL}/${id}`, {
       username,
       email,
+      // password: 'nothing',
     });
     return response;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 
-  return undefined;
 };
 
 export const removeUser = async (id) => {

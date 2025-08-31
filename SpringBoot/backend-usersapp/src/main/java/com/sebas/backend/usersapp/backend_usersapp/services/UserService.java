@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.sebas.backend.usersapp.backend_usersapp.models.enitties.User;
+import com.sebas.backend.usersapp.backend_usersapp.models.request.UserRequest;
 
 public interface UserService {
 
@@ -13,7 +14,7 @@ public interface UserService {
 
     User saveUser(User user);
 
-    Optional<User> updateUser(Long id, User user);
+    Optional<User> updateUser(Long id, UserRequest user);
 
     void removeUserById(Long id);
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sebas.backend.usersapp.backend_usersapp.models.enitties.User;
+import com.sebas.backend.usersapp.backend_usersapp.models.request.UserRequest;
 import com.sebas.backend.usersapp.backend_usersapp.repositories.UserRepository;
 
 @Service
@@ -34,8 +35,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-       @Override
-    public Optional<User> updateUser(Long id, User user) {
+    @Override
+    @Transactional
+    public Optional<User> updateUser(Long id, UserRequest user) {
         Optional<User> userOptional = this.findUserById(id);
         User userToUpdate = null;
         if (userOptional.isPresent()) {
