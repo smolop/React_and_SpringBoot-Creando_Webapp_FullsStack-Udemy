@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sebas.backend.usersapp.backend_usersapp.models.dto.UserDto;
 import com.sebas.backend.usersapp.backend_usersapp.models.enitties.User;
 import com.sebas.backend.usersapp.backend_usersapp.models.request.UserRequest;
 import com.sebas.backend.usersapp.backend_usersapp.services.UserService;
@@ -37,13 +38,13 @@ public class UserController {
     private UserService userService;
 
     @GetMapping()
-    public List<User> usersList() {
+    public List<UserDto> usersList() {
         return userService.findAllUsers();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> showUserById(@PathVariable("id") Long id) {
-        Optional<User> userOptional = userService.findUserById(id);
+    public ResponseEntity<UserDto> showUserById(@PathVariable("id") Long id) {
+        Optional<UserDto> userOptional = userService.findUserById(id);
         if (userOptional.isPresent()) {
             return ResponseEntity.ok(userOptional.orElseThrow());
         }
@@ -80,7 +81,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> removeUser(@PathVariable("id") Long id) {
-         Optional<User> userOptional = userService.findUserById(id);
+         Optional<UserDto> userOptional = userService.findUserById(id);
          if (userOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
          }

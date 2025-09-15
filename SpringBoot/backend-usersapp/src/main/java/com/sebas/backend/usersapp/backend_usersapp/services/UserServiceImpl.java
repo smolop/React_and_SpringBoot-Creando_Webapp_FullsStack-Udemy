@@ -1,14 +1,22 @@
 package com.sebas.backend.usersapp.backend_usersapp.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sebas.backend.usersapp.backend_usersapp.models.dto.UserDto;
+import com.sebas.backend.usersapp.backend_usersapp.models.dto.mapper.UserDtoMapper;
+import com.sebas.backend.usersapp.backend_usersapp.models.enitties.Role;
 import com.sebas.backend.usersapp.backend_usersapp.models.enitties.User;
 import com.sebas.backend.usersapp.backend_usersapp.models.request.UserRequest;
+import com.sebas.backend.usersapp.backend_usersapp.repositories.RoleRepository;
 import com.sebas.backend.usersapp.backend_usersapp.repositories.UserRepository;
 
 @Service
@@ -17,36 +25,73 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     @Transactional(readOnly = true)
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
+    public List<UserDto> findAllUsers() {
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+                .map(user -> UserDtoMapper
+                        .builder()
+                        .setUser(user)
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> findUserById(Long id) {
-        return userRepository.findById(id);
+    public Optional<UserDto> findUserById(Long id) {
+        return userRepository.findById(id)
+                .map(user -> UserDtoMapper
+                        .builder()
+                        .setUser(user)
+                        .build());
+
     }
 
     @Override
     @Transactional
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public UserDto saveUser(User user) {
+        String passwordBc = passwordEncoder.encode(user.getPassword());
+        user.setPassword(passwordBc);
+
+        List<Role> roles = new ArrayList<>();
+        Optional<Role> userRoleOptional = roleRepository.findByName("ROLE_USER");
+
+        if (userRoleOptional.isPresent())
+            roles.add(userRoleOptional.orElseThrow());
+
+        user.setRoles(roles);
+
+        return UserDtoMapper
+                .builder()
+                .setUser(userRepository.save(user))
+                .build();
     }
 
     @Override
     @Transactional
-    public Optional<User> updateUser(Long id, UserRequest user) {
-        Optional<User> userOptional = this.findUserById(id);
-        User userToUpdate = null;
+    public Optional<UserDto> updateUser(Long id, UserRequest user) {
+        Optional<User> userOptional = userRepository.findById(id);
+        User updatedUser = null;
         if (userOptional.isPresent()) {
-            userToUpdate = userOptional.orElseThrow();
+            User userToUpdate = userOptional.orElseThrow();
             userToUpdate.setUsername(user.getUsername());
             userToUpdate.setEmail(user.getEmail());
-            return Optional.of(this.saveUser(userToUpdate));
+            updatedUser = userRepository.save(userToUpdate);
         }
-        return Optional.ofNullable(userToUpdate);
+        return Optional
+                .ofNullable(
+                        UserDtoMapper
+                                .builder()
+                                .setUser(updatedUser)
+                                .build());
     }
 
     @Override
