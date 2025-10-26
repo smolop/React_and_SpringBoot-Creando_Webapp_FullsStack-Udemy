@@ -1,5 +1,7 @@
 package com.sebas.backend.usersapp.backend_usersapp.models.request;
 
+import com.sebas.backend.usersapp.backend_usersapp.models.IUser;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -9,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserRequest {
+public class UserRequest implements IUser{
 
     @NotBlank
     @Size(min = 4, max = 8)
@@ -18,5 +20,12 @@ public class UserRequest {
     @NotEmpty
     @Email
     private String email;
+
+    private boolean admin;
+
+    @Override
+    public boolean isAdmin() {
+        return admin;
+    }
     
 }

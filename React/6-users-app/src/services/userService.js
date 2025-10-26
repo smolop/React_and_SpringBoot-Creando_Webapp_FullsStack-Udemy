@@ -1,53 +1,66 @@
-import axios from "axios";
+import usersApi from "../apis/userApi";
 
-const BASE_URL = "http://localhost:8080/api/v1/users";
+const BASE_URL = "";
+
+/* const config = () => {
+  return {
+    headers: {
+      Authorization: sessionStorage.getItem("token"),
+      "Content-Type": "application/json",
+    },
+  };
+}; */
 
 export const findAllUsers = async () => {
   try {
-    const response = await axios.get(BASE_URL);
+    const response = await usersApi.get(BASE_URL);
     return response;
   } catch (error) {
     console.log(error);
+    throw error;
   }
-
-  return null;
 };
 
-export const createUser = async ({ username, email, password }) => {
+export const createUser = async ({ username, email, password, admin }) => {
   try {
-    const response = await axios.post(BASE_URL, {
-      username,
-      email,
-      password,
-    });
+    const response = await usersApi.post(
+      BASE_URL,
+      {
+        username,
+        email,
+        password,
+        admin
+      }
+    );
     return response;
   } catch (error) {
     console.error(error);
     throw error;
   }
-
 };
 
-export const updateUser = async ({ id, username, email }) => {
+export const updateUser = async ({ id, username, email, admin }) => {
   try {
-    const response = await axios.put(`${BASE_URL}/${id}`, {
-      username,
-      email,
-      // password: 'nothing',
-    });
+    const response = await usersApi.put(
+      `${BASE_URL}/${id}`,
+      {
+        username,
+        email,
+        admin
+      }
+    );
     return response;
   } catch (error) {
     console.error(error);
     throw error;
   }
-
 };
 
 export const removeUser = async (id) => {
   try {
-    await axios.delete(`${BASE_URL}/${id}`);
-    
+    await usersApi.delete(`${BASE_URL}/${id}`);
   } catch (error) {
     console.error(error);
+    throw error;
   }
-}
+};

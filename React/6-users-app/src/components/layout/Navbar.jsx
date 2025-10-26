@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import { AuthContext } from "../../auth/context/AuthContext";
 
 export const Navbar = () => {
-  
   const { login, handlerLogout } = useContext(AuthContext);
 
   return (
@@ -31,11 +30,13 @@ export const Navbar = () => {
                 Users
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/users/register">
-                User Register
-              </NavLink>
-            </li>
+            {!login.isAdmin || (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/users/register">
+                  User Register
+                </NavLink>
+              </li>
+            )}
           </ul>
         </div>
 

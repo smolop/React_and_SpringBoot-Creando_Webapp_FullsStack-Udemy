@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.naming.Binding;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +68,7 @@ public class UserController {
             return validationErros(result);
         }
 
-        Optional<User> userOptional = userService.updateUser(id, user);
+        Optional<UserDto> userOptional = userService.updateUser(id, user);
         if (userOptional.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.CREATED)

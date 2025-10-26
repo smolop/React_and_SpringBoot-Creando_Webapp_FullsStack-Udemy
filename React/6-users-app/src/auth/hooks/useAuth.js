@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const initialLogin = JSON.parse(sessionStorage.getItem("login")) || {
   isAuth: false,
+  isAdmin: false,
   user: undefined,
 };
 
@@ -13,33 +14,51 @@ export const useAuth = () => {
   const [login, dispatch] = useReducer(loginReducer, initialLogin);
   const navigate = useNavigate();
 
-  const handlerLogin = ({ username, password }) => {
-    const isLogin = loginUser({ username, password });
-
-    if (isLogin) {
-      const user = { username: "admin" };
+  const handlerLogin = async ({ username, password }) => {
+   
+    try {
+      const loginResponse = await loginUser({ username, password });
+      const token = loginResponse.data.token;
+      console.log('TOKEN: ' + token);
+      const claims = JSON.parse(window.atob(token.split(".")[1]));
+      console.log(claims);
+      // const user = { username: "admin" };
+      const user = { username: claims.username }
       dispatch({
         type: "login",
-        payload: user,
+        payload: { user, isAdmin: claims.isAdmin },
       });
       sessionStorage.setItem(
         "login",
         JSON.stringify({
           isAuth: true,
+          isAdmin: claims.isAdmin,
           user: user,
         })
       );
+      sessionStorage.setItem('token', `Bearer ${token}`);
       navigate('/users');
-    } else {
-      Swal.fire("Login Error", "Invalid username and password", "error");
+    } catch (error) {
+
+      if (error.response?.status == 401) {
+        Swal.fire("Login Error", "Invalid credentials", "error");
+      } else if (error.response?.status == 403) {
+        Swal.fire("Login Error", "It doesn't have permissions", "error");
+      } else {
+        throw error;
+      }
+
     }
+
   };
 
   const handlerLogout = () => {
     dispatch({
       type: "logout",
     });
+    sessionStorage.removeItem('token');
     sessionStorage.removeItem("login");
+    sessionStorage.clear();
   };
 
   return {

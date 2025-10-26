@@ -3,7 +3,6 @@ package com.sebas.backend.usersapp.backend_usersapp.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sebas.backend.usersapp.backend_usersapp.models.IUser;
 import com.sebas.backend.usersapp.backend_usersapp.models.dto.UserDto;
 import com.sebas.backend.usersapp.backend_usersapp.models.dto.mapper.UserDtoMapper;
 import com.sebas.backend.usersapp.backend_usersapp.models.enitties.Role;
@@ -61,18 +61,28 @@ public class UserServiceImpl implements UserService {
         String passwordBc = passwordEncoder.encode(user.getPassword());
         user.setPassword(passwordBc);
 
+        user.setRoles(getUserRoles(user));
+
+        return UserDtoMapper
+                .builder()
+                .setUser(userRepository.save(user))
+                .build();
+    }
+
+    private List<Role> getUserRoles(IUser user) {
         List<Role> roles = new ArrayList<>();
         Optional<Role> userRoleOptional = roleRepository.findByName("ROLE_USER");
 
         if (userRoleOptional.isPresent())
             roles.add(userRoleOptional.orElseThrow());
 
-        user.setRoles(roles);
-
-        return UserDtoMapper
-                .builder()
-                .setUser(userRepository.save(user))
-                .build();
+        if (user.isAdmin()) {
+            Optional<Role> adminRoleOptional = roleRepository.findByName("ROLE_ADMIN");
+            if (adminRoleOptional.isPresent()) {
+                roles.add(adminRoleOptional.orElseThrow());
+            }
+        }
+        return roles;
     }
 
     @Override
@@ -81,7 +91,9 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findById(id);
         User updatedUser = null;
         if (userOptional.isPresent()) {
+
             User userToUpdate = userOptional.orElseThrow();
+            userToUpdate.setRoles(getUserRoles(user));
             userToUpdate.setUsername(user.getUsername());
             userToUpdate.setEmail(user.getEmail());
             updatedUser = userRepository.save(userToUpdate);

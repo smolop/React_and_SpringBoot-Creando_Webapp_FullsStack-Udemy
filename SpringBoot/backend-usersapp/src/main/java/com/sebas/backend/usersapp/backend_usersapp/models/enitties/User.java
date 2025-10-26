@@ -2,6 +2,8 @@ package com.sebas.backend.usersapp.backend_usersapp.models.enitties;
 
 import java.util.List;
 
+import com.sebas.backend.usersapp.backend_usersapp.models.IUser;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -23,7 +26,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements IUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,5 +51,13 @@ public class User {
     inverseJoinColumns = @JoinColumn(name = "role_id"),
     uniqueConstraints = { @UniqueConstraint(columnNames = {"user_id", "role_id"})})
     private List<Role> roles;
+
+    @Transient
+    private boolean admin;
+
+    @Override
+    public boolean isAdmin() {
+        return admin;
+    }
 
 }

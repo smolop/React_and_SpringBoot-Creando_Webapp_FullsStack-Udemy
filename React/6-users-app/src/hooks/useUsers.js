@@ -1,4 +1,4 @@
-import { useReducer, useState } from "react";
+import { useContext, useReducer, useState } from "react";
 import { usersReducer } from "../reducers/usersReducer";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ import {
   removeUser,
   updateUser,
 } from "../services/userService";
+import { AuthContext } from "../auth/context/AuthContext";
 
 const initialUsers = [];
 
@@ -16,6 +17,7 @@ const initialUserForm = {
   username: "",
   password: "",
   email: "",
+  admin: false
 };
 
 const initialErrors = {
@@ -32,19 +34,29 @@ export const useUsers = () => {
   const [errors, setErrors] = useState(initialErrors);
   const navigate = useNavigate();
 
+  const { login, handlerLogout } = useContext(AuthContext);
+
   const getUsers = async () => {
-    const result = await findAllUsers();
-    console.log(result);
-    if (result) {
-      dispatch({
-        type: "loadingUsers",
-        payload: result.data,
-      });
+    try {
+      const result = await findAllUsers();
+      console.log(result);
+      if (result) {
+        dispatch({
+          type: "loadingUsers",
+          payload: result.data,
+        });
+      }
+    } catch (error) {
+     if (error.response?.status == 401) {
+            handlerLogout();
+          } 
     }
   };
 
   const handlerAddUser = async (user) => {
     // console.log(user);
+
+    if (!login.isAdmin) return;
 
     let response;
 
@@ -74,10 +86,11 @@ export const useUsers = () => {
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setErrors(error.response.data);
-      } else if (error.response && error.response.status === 500
-        && error.response.data?.message?.includes("constraint")
+      } else if (
+        error.response &&
+        error.response.status === 500 &&
+        error.response.data?.message?.includes("constraint")
       ) {
-
         if (error.response.data?.message?.includes("UK_username")) {
           setErrors({ username: "The username already exists" });
         }
@@ -85,7 +98,8 @@ export const useUsers = () => {
         if (error.response.data?.message?.includes("UK_email")) {
           setErrors({ email: "The email already exists" });
         }
-
+      } else if (error.response?.status == 401) {
+        handlerLogout();
       } else {
         throw error;
       }
@@ -95,6 +109,8 @@ export const useUsers = () => {
   const handlerRemoveUser = (id) => {
     // console.log(id);
 
+    if (!login.isAdmin) return;
+
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -103,19 +119,25 @@ export const useUsers = () => {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        removeUser(id);
-        dispatch({
-          type: "removeUser",
-          payload: id,
-        });
+        try {
+          await removeUser(id);
+          dispatch({
+            type: "removeUser",
+            payload: id,
+          });
 
-        Swal.fire({
-          title: "User Deleted!",
-          text: "The user has been deleted sucessfully.",
-          icon: "success",
-        });
+          Swal.fire({
+            title: "User Deleted!",
+            text: "The user has been deleted sucessfully.",
+            icon: "success",
+          });
+        } catch (error) {
+          if (error.response?.status == 401) {
+            handlerLogout();
+          }
+        }
       }
     });
     navigate("/users");
