@@ -1,45 +1,40 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 const initialLoginForm = {
-        username: '',
-        password: ''
-    }
+  username: "",
+  password: "",
+};
 
 export const LoginPage = () => {
+  const { handlerLogin } = useAuth();
 
-    const {handlerLogin} = useContext(AuthContext);
+  const [loginForm, setLoginForm] = useState(initialLoginForm);
+  const { username, password } = loginForm;
 
-    const [loginForm, setLoginForm] = useState(initialLoginForm)
-    const {username, password} = loginForm;
+  const onInputChange = ({ target }) => {
+    const { name, value } = target;
+    setLoginForm({
+      ...loginForm,
+      [name]: value,
+    });
+  };
 
-    const onInputChange = ({target}) => {
-        const {name, value} = target;
-        setLoginForm({
-            ...loginForm,
-            [name]: value,
-        })
+  const onSubmit = (event) => {
+    event.preventDefault();
+    if (!username || !password) {
+      Swal.fire("Validation Error", "Username and password required", "error");
     }
 
-    const onSubmit = (event) => {
-        event.preventDefault();
-        if (!username || !password) {
-            Swal.fire('Validation Error', 
-                'Username and password required',
-                'error'
-            )
-        }
+    // Here we are going to implement the login
+    handlerLogin({ username, password });
 
-        // Here we are going to implement the login
-        handlerLogin({username, password});
-
-        setLoginForm(initialLoginForm);
-    }
-
+    setLoginForm(initialLoginForm);
+  };
 
   return (
-    <div className="modal" style={ {display: 'block'} } tabIndex="-1">
+    <div className="modal" style={{ display: "block" }} tabIndex="-1">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
