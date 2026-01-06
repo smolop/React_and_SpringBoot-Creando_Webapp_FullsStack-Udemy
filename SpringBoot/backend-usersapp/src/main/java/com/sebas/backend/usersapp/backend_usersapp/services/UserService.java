@@ -6,10 +6,14 @@ import java.util.Optional;
 import com.sebas.backend.usersapp.backend_usersapp.models.dto.UserDto;
 import com.sebas.backend.usersapp.backend_usersapp.models.enitties.User;
 import com.sebas.backend.usersapp.backend_usersapp.models.request.UserRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
     List<UserDto> findAllUsers();
+
+    Page<UserDto> findAllUsers(Pageable pageable);
 
     Optional<UserDto> findUserById(Long id);
 

@@ -1,10 +1,9 @@
-import { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import {
   createUser,
-  findAllUsers,
+  findAllUsersPages,
   removeUser,
   updateUser,
 } from "../services/userService";
@@ -23,7 +22,7 @@ import { useAuth } from "../auth/hooks/useAuth";
 
 export const useUsers = () => {
   // const [users, dispatch] = useReducer(usersReducer, initialUsers);
-  const { users, userSelected, visibleForm, errors, isLoading } = useSelector(
+  const { users, userSelected, visibleForm, errors, isLoading, paginator } = useSelector(
     (state) => state.users
   );
   const dispatch = useDispatch();
@@ -35,9 +34,9 @@ export const useUsers = () => {
 
   const { login, handlerLogout } = useAuth();
 
-  const getUsers = async () => {
+  const getUsers = async (page = 0) => {
     try {
-      const result = await findAllUsers();
+      const result = await findAllUsersPages(page);
       console.log(result);
       if (result) {
         dispatch(sliceLoadingUsers(result.data));
@@ -163,6 +162,7 @@ export const useUsers = () => {
     visibleForm,
     errors,
     isLoading,
+    paginator,
     handlerAddUser,
     handlerRemoveUser,
     handlerUserSelectedForm,

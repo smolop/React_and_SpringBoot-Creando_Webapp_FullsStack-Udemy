@@ -21,6 +21,17 @@ export const findAllUsers = async () => {
   }
 };
 
+export const findAllUsersPages = async (page = 0) => {
+  try {
+    const response = await usersApi.get(`${BASE_URL}/page/${page}`);
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+
 export const createUser = async ({ username, email, password, admin }) => {
   try {
     const response = await usersApi.post(

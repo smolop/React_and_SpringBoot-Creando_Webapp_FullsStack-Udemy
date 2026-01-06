@@ -3,16 +3,19 @@ import { UserList } from "../components/UserList";
 import { UserModalForm } from "../components/UserModalForm";
 import { useUsers } from "../hooks/useUsers";
 import { useAuth } from "../auth/hooks/useAuth";
+import { useParams } from "react-router-dom";
+import { Paginator } from "../components/Paginator";
 
 export const UsersPage = () => {
-  const { users, visibleForm, isLoading, handlerOpenForm, getUsers } =
+  const { page } = useParams();
+  const { users, visibleForm, isLoading, paginator, handlerOpenForm, getUsers } =
     useUsers();
 
   const { login } = useAuth();
 
   useEffect(() => {
-    getUsers();
-  }, []);
+    getUsers(page);
+  }, [, page]);
 
   if (isLoading) {
     return (
@@ -44,7 +47,10 @@ export const UsersPage = () => {
                 There aren't users in the system!
               </div>
             ) : (
-              <UserList />
+              <>
+                <UserList />
+                <Paginator url="/users/page" paginator={paginator}/>
+              </>
             )}
           </div>
         </div>

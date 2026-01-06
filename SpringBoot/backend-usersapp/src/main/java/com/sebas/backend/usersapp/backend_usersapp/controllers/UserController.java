@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,12 @@ public class UserController {
     @GetMapping()
     public List<UserDto> usersList() {
         return userService.findAllUsers();
+    }
+
+    @GetMapping("/page/{page}")
+    public Page<UserDto> usersList(@PathVariable Integer page) {
+        Pageable pageable = PageRequest.of(page, 4);
+        return userService.findAllUsers(pageable);
     }
 
     @GetMapping("/{id}")
