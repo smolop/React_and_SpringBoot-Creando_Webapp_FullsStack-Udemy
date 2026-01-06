@@ -5,12 +5,8 @@ import { useUsers } from "../hooks/useUsers";
 import { useAuth } from "../auth/hooks/useAuth";
 
 export const UsersPage = () => {
-  const {
-    users,
-    visibleForm,
-    handlerOpenForm,
-    getUsers,
-  } = useUsers();
+  const { users, visibleForm, isLoading, handlerOpenForm, getUsers } =
+    useUsers();
 
   const { login } = useAuth();
 
@@ -18,16 +14,24 @@ export const UsersPage = () => {
     getUsers();
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="container my-4">
+        {/* <h4>Loading...</h4> */}
+        <div className="spinner-border text-info" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
-      {!visibleForm || (
-        <UserModalForm />
-      )}
+      {!visibleForm || <UserModalForm />}
       <div className="container my-4">
         <h2>UsersApp</h2>
         <div className="row">
           <div className="col">
-            { (visibleForm || !login.isAdmin) || (
+            {visibleForm || !login.isAdmin || (
               <button
                 className="btn btn-primary my-2"
                 onClick={handlerOpenForm}
